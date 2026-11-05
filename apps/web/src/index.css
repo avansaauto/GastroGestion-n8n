@@ -69,8 +69,7 @@ textarea { font: inherit; }
 
 @layer components {
   .gg-page {
-    @apply mx-auto w-full space-y-6;
-    max-width: var(--content-max);
+    @apply w-full space-y-6;
     padding: var(--space-page);
   }
 

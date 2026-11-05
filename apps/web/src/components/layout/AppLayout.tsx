@@ -10,8 +10,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
   useEffect(() => setMenuOpen(false), [pathname])
 
   return (
-    <div className="flex h-screen overflow-hidden bg-senda-canvas p-3 sm:p-4">
-      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden rounded-[1.35rem] border border-senda-border bg-senda-surface shadow-panel">
+    <div className="flex h-dvh w-full overflow-hidden bg-senda-surface">
+      <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
         <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex items-center px-3 pt-3 lg:hidden">
