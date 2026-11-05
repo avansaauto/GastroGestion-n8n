@@ -78,7 +78,12 @@ describe('presentación física', () => {
         approximateAccepted: false,
         conversionFactor: factorFromPresentationAnswer(3.5, 'g'),
         action: 'create' as const,
-        createIntent: { name: 'La Paulina', baseUnit: 'g' as const },
+        createIntent: {
+          name: 'La Paulina',
+          baseUnit: 'g' as const,
+          category: null,
+          minimumStock: null,
+        },
       },
     }
     const first = buildConfirmIntakeLines([paulina], { 'line-paulina': '2' }, drafts, [], () => 'recv-1')

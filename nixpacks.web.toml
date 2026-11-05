@@ -1,0 +1,11 @@
+[variables]
+NIXPACKS_NODE_VERSION = "20"
+
+[phases.install]
+cmds = ["npm ci --include=dev"]
+
+[phases.build]
+cmds = ["npm run build -w @senda-ops/web"]
+
+[start]
+cmd = "npm run start -w @senda-ops/web"

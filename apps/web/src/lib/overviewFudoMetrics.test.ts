@@ -11,7 +11,6 @@ function row(partial: Partial<PendingProduct> & {
     location_id: 'loc',
     source: partial.source ?? 'fudo',
     product_name: partial.product_name ?? `Prod ${partial.external_product_id}`,
-    external_product_id: partial.external_product_id,
     status: partial.status ?? 'pending',
     mapping_id: partial.mapping_id ?? null,
     mapping_active: partial.mapping_active ?? null,

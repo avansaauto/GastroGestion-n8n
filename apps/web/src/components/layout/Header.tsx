@@ -1,12 +1,13 @@
-import { ChevronDown, LogOut, Menu } from 'lucide-react'
-import { useEffect, useId, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
+import { ChevronDown, LogOut } from 'lucide-react'
+import { useContext, useEffect, useId, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { zIndex } from '@/design-system/zIndex'
-import { useAuthorizedScopeContext } from '@/lib/AuthorizedScopeProvider'
-import { useAuth } from '@/lib/auth'
+import { AuthorizedScopeContext } from '@/lib/AuthorizedScopeProvider'
+import { AuthContext } from '@/lib/auth'
+import { cn } from '@/lib/utils'
 import { organizationChangePath } from '@/lib/locationGate'
 import { locationName, organizationName } from '@/lib/operations'
 import type { Location, Organization } from '@/lib/api'
@@ -50,6 +51,8 @@ export function HeaderLocationSwitcher({
   locations,
   organizations,
   open = false,
+  align = 'end',
+  menuPlacement = 'down',
   organizationChangeHref,
   onOpenChange,
   onSelectLocation,
@@ -60,6 +63,8 @@ export function HeaderLocationSwitcher({
   locations: Location[]
   organizations: Organization[]
   open?: boolean
+  align?: 'start' | 'end'
+  menuPlacement?: 'up' | 'down'
   organizationChangeHref: string
   onOpenChange?: (open: boolean) => void
   onSelectLocation: (locationId: string) => boolean
@@ -71,14 +76,20 @@ export function HeaderLocationSwitcher({
   const canSwitchOrganization = organizations.length > 1
 
   return (
-    <div className="relative min-w-0 max-w-[46vw] text-right sm:max-w-56">
+    <div className={cn(
+      'relative min-w-0',
+      align === 'start' ? 'w-full text-left' : 'max-w-[46vw] text-right sm:max-w-56',
+    )}>
       {canSwitchLocation ? (
         <button
           aria-controls={listId}
           aria-expanded={open}
           aria-haspopup="listbox"
-          aria-label={`Local activo: ${locationName(location)}. Cambiar local`}
-          className="flex w-full min-w-0 items-center justify-end gap-1 rounded-lg px-1 py-0.5 text-right hover:bg-senda-subtle focus:outline-none focus:ring-2 focus:ring-senda-navy"
+          aria-label={`${locationName(location)}. Cambiar local`}
+          className={cn(
+            'flex w-full min-w-0 items-center gap-1 rounded-lg px-1 py-0.5 hover:bg-senda-subtle focus:outline-none focus:ring-2 focus:ring-senda-navy',
+            align === 'start' ? 'justify-start text-left' : 'justify-end text-right',
+          )}
           type="button"
           onClick={() => onOpenChange?.(!open)}
         >
@@ -89,7 +100,7 @@ export function HeaderLocationSwitcher({
           <ChevronDown className="shrink-0 text-senda-muted" size={16} />
         </button>
       ) : (
-        <div>
+        <div className={align === 'start' ? 'min-w-0 text-left' : undefined}>
           <p className="m-0 truncate text-sm font-semibold text-senda-ink">{locationName(location)}</p>
           <p className="m-0 truncate text-xs text-senda-muted">{organizationName(organization)}</p>
           {canSwitchOrganization && (
@@ -106,7 +117,10 @@ export function HeaderLocationSwitcher({
 
       {canSwitchLocation && open && (
         <div
-          className="absolute right-0 mt-2 w-64 overflow-hidden rounded-xl border border-senda-border bg-white py-1 text-left shadow-panel"
+          className={cn(
+            'absolute z-50 w-64 overflow-hidden rounded-xl border border-senda-border bg-white py-1 text-left shadow-panel',
+            menuPlacement === 'up' ? 'bottom-full left-0 mb-2' : 'right-0 mt-2',
+          )}
           id={listId}
           role="listbox"
           aria-label="Locales autorizados"
@@ -172,11 +186,11 @@ export function HeaderWorkspace(props: {
   )
 }
 
-export function Header({ onMenu }: { onMenu: () => void }) {
+export function SidebarSession() {
   const { pathname, search } = useLocation()
   const navigate = useNavigate()
-  const { previewMode, signOut } = useAuth()
-  const scope = useAuthorizedScopeContext()
+  const auth = useContext(AuthContext)
+  const scope = useContext(AuthorizedScopeContext)
   const guard = useWorkspaceGuardRegistry()
   const [open, setOpen] = useState(false)
   const [prompt, setPrompt] = useState<WorkspaceSwitchPromptState | null>(null)
@@ -184,6 +198,7 @@ export function Header({ onMenu }: { onMenu: () => void }) {
 
   function applySwitch(next: { type: 'location'; id: string } | { type: 'org'; href: string }) {
     guard.discardAll()
+    if (!scope) return
     if (next.type === 'location') {
       scope.selectLocation(next.id)
       return
@@ -217,7 +232,7 @@ export function Header({ onMenu }: { onMenu: () => void }) {
 
   useEffect(() => {
     setOpen(false)
-  }, [pathname, scope.locationId])
+  }, [pathname, scope?.locationId])
 
   useEffect(() => {
     if (!open) return
@@ -236,40 +251,39 @@ export function Header({ onMenu }: { onMenu: () => void }) {
   }, [open])
 
   return (
-    <header className="flex h-[3.75rem] shrink-0 items-center justify-between border-b border-senda-border bg-senda-surface/90 px-4 backdrop-blur-md sm:px-6">
-      <div className="flex min-w-0 items-center gap-3">
-        <button
-          aria-label="Abrir menú"
-          className="rounded-control p-2 text-senda-muted hover:bg-senda-subtle lg:hidden"
-          onClick={onMenu}
-        >
-          <Menu size={20} />
-        </button>
-      </div>
-      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-        {previewMode && <Badge tone="warning">Vista previa · sin Supabase</Badge>}
-        <div ref={rootRef}>
-          <HeaderLocationSwitcher
-            location={scope.location}
-            locations={scope.locations}
-            open={open}
-            organization={scope.organization}
-            organizationChangeHref={organizationChangePath(pathname, search)}
-            organizations={scope.organizations}
-            onOpenChange={setOpen}
-            onOrganizationChange={(event, href) => {
-              event.preventDefault()
-              considerSwitch({ type: 'org', href })
-            }}
-            onSelectLocation={(nextLocationId) => {
-              if (nextLocationId === scope.locationId) return true
-              return considerSwitch({ type: 'location', id: nextLocationId })
-            }}
-          />
+    <div className="mt-auto border-t border-senda-border/80 px-3 py-3">
+      {auth?.previewMode ? (
+        <Badge className="mb-2" tone="warning">Vista previa · sin Supabase</Badge>
+      ) : null}
+      <div className="flex items-center gap-1">
+        <div className="min-w-0 flex-1" ref={rootRef}>
+          {scope ? (
+            <HeaderLocationSwitcher
+              align="start"
+              location={scope.location}
+              locations={scope.locations}
+              menuPlacement="up"
+              open={open}
+              organization={scope.organization}
+              organizationChangeHref={organizationChangePath(pathname, search)}
+              organizations={scope.organizations}
+              onOpenChange={setOpen}
+              onOrganizationChange={(event, href) => {
+                event.preventDefault()
+                considerSwitch({ type: 'org', href })
+              }}
+              onSelectLocation={(nextLocationId) => {
+                if (nextLocationId === scope.locationId) return true
+                return considerSwitch({ type: 'location', id: nextLocationId })
+              }}
+            />
+          ) : null}
         </div>
-        <Button aria-label="Cerrar sesión" className="px-3" variant="ghost" onClick={() => void signOut()}>
-          <LogOut size={17} />
-        </Button>
+        {auth ? (
+          <Button aria-label="Cerrar sesión" className="px-2" variant="ghost" onClick={() => void auth.signOut()}>
+            <LogOut size={17} />
+          </Button>
+        ) : null}
       </div>
       <WorkspaceSwitchPrompt
         prompt={prompt}
@@ -280,6 +294,6 @@ export function Header({ onMenu }: { onMenu: () => void }) {
           if (next) applySwitch(next)
         }}
       />
-    </header>
+    </div>
   )
 }

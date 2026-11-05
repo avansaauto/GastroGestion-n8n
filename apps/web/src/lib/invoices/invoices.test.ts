@@ -111,6 +111,7 @@ import {
   emptyReviewMappingDraft,
   hydrateReviewMappingDrafts,
   reviewMappingPhysicalLabel,
+  type ReviewMappingDraft,
 } from './reviewMapping'
 import {
   inventoryCopy,
@@ -1051,7 +1052,7 @@ describe('Paso 386 claridad de cantidades', () => {
     })
     expect(reviewLineVisual(pilsen, {
       mappingAvailable: true,
-      mappingDraft: { inventoryProductId: 'prod-1', approximateAccepted: false },
+      mappingDraft: { inventoryProductId: 'prod-1', approximateAccepted: false } as ReviewMappingDraft,
     })).toMatchObject({ kind: 'eligible', label: 'Habilitada', tone: 'success' })
     expect(canEditReviewReceived(pilsen)).toBe(true)
     const copy = reviewInventorySummary(confirmedBonusInvoiceResult, {
@@ -1742,7 +1743,7 @@ describe('ingesta al guardar', () => {
       planned: planReviewIntake(
         [line],
         { 'line-liquid': '2' },
-        { 'line-liquid': { inventoryProductId: PRODUCT.id, approximateAccepted: false } },
+        { 'line-liquid': { inventoryProductId: PRODUCT.id, approximateAccepted: false } as ReviewMappingDraft },
         [PRODUCT],
       ),
       saveInvoice: saveInvoiceFn,

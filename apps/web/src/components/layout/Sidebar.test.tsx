@@ -4,13 +4,10 @@ import { describe, expect, it } from 'vitest'
 import { Sidebar, SidebarNav } from './Sidebar'
 import { navigationItems, navigationSections } from './navigation'
 
-function navHtml(pathname: string, collapsed = false) {
+function navHtml(pathname: string) {
   return renderToString(
     <MemoryRouter initialEntries={[pathname]}>
-      <SidebarNav
-        collapsed={collapsed}
-        pathname={pathname}
-      />
+      <SidebarNav pathname={pathname} />
     </MemoryRouter>,
   )
 }
@@ -109,10 +106,11 @@ describe('sidebar GastroGest', () => {
     expect(html).not.toContain('SENDA OPS')
     expect(html).not.toContain('Etapa 1')
     expect(html).not.toContain('Interfaz base sin conexiones externas')
-    expect(html).toContain('OGHAM · Barrio Chino')
-    expect(html).toContain('Local activo')
+    expect(html).not.toContain('Local activo')
+    expect(html).not.toContain('OGHAM · Barrio Chino')
     expect(html).toContain('bg-senda-surface')
-    expect(html).toContain('rounded-[1.35rem]')
+    expect(html).toContain('w-sidebar')
+    expect(html).not.toContain('role="tooltip"')
   })
 
   it('deja Facturas y Recetas como enlaces, sin submenú', () => {
@@ -126,9 +124,10 @@ describe('sidebar GastroGest', () => {
     expect(html).toContain('href="/recetas"')
   })
 
-  it('en modo colapsado oculta etiquetas de sección pero conserva tooltips', () => {
-    const html = navHtml('/inventario', true)
-    expect(html).toContain('role="tooltip"')
-    expect(html).toContain('opacity-0')
+  it('deja la navegación siempre abierta, con etiquetas visibles', () => {
+    const html = navHtml('/inventario')
+    expect(html).toContain('Operación')
+    expect(html).toContain('>Inventario<')
+    expect(html).not.toContain('role="tooltip"')
   })
 })

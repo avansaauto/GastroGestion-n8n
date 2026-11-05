@@ -196,10 +196,18 @@ export async function analyzeInvoiceJob(
       }
       if (!response.ok) throw mapInvoiceHttpError(response.status, payload)
       const data = payload.data
-      if (!data?.jobId || !data.status) {
+      const jobId = data?.jobId
+      const status = data?.status
+      if (!data || !jobId || !status) {
         throw new InvoiceApiError('La respuesta del análisis está incompleta.', 502, 'PROVIDER_INVALID_RESPONSE')
       }
-      return data
+      return {
+        jobId,
+        status,
+        result: data.result,
+        failureCode: data.failureCode,
+        reused: data.reused,
+      }
     } catch (error) {
       if (error instanceof InvoiceApiError) throw error
       const stopped = stopError()

@@ -19,7 +19,12 @@ import { baseInvoiceResult, bonusInvoiceResult, confirmedBonusInvoiceResult, sav
 import { createMemoryAttemptStore, prepareReceiveAttempt } from '@/lib/invoices/receiveAttempt'
 import { applyInvoiceReceiveResult } from '@/lib/invoices/invoiceReceiveState'
 import { LINE_ASSOCIATION_MISSING } from '@/lib/invoices/mapping'
+import type { ReviewMappingDraft } from '@/lib/invoices/reviewMapping'
 import type { InvoiceAnalysisLine, InvoiceDetail, InvoiceListItem, InvoiceStoredLine } from '@/lib/invoices/types'
+
+function reviewDraft(inventoryProductId: string): ReviewMappingDraft {
+  return { inventoryProductId, approximateAccepted: false } as ReviewMappingDraft
+}
 
 describe('pantallas de facturas', () => {
   it('muestra el vacío real sin historial simulado', () => {
@@ -486,7 +491,7 @@ describe('pantallas de facturas', () => {
         <InvoiceReview
           localDecisions={{}}
           mappingCatalog={catalog}
-          mappingDrafts={{ 'line-liquid': { inventoryProductId: liquid.id, approximateAccepted: false } }}
+          mappingDrafts={{ 'line-liquid': reviewDraft(liquid.id) }}
           mappingSuggestions={{
             'line-liquid': {
               kind: 'exact',
@@ -522,7 +527,7 @@ describe('pantallas de facturas', () => {
         <InvoiceReview
           localDecisions={{}}
           mappingCatalog={catalog}
-          mappingDrafts={{ 'line-liquid': { inventoryProductId: '', approximateAccepted: false } }}
+          mappingDrafts={{ 'line-liquid': reviewDraft('') }}
           mappingSuggestions={{
             'line-liquid': {
               kind: 'approximate',
@@ -550,7 +555,7 @@ describe('pantallas de facturas', () => {
         <InvoiceReview
           localDecisions={{}}
           mappingCatalog={catalog}
-          mappingDrafts={{ 'line-liquid': { inventoryProductId: '', approximateAccepted: false } }}
+          mappingDrafts={{ 'line-liquid': reviewDraft('') }}
           mappingSuggestions={{ 'line-liquid': null }}
           result={twoLitres}
           onAcceptMappingSuggestion={() => undefined}
@@ -572,7 +577,7 @@ describe('pantallas de facturas', () => {
         <InvoiceReview
           localDecisions={{}}
           mappingCatalog={catalog}
-          mappingDrafts={{ 'line-liquid': { inventoryProductId: flour.id, approximateAccepted: false } }}
+          mappingDrafts={{ 'line-liquid': reviewDraft(flour.id) }}
           mappingSuggestions={{ 'line-liquid': null }}
           result={twoLitres}
           onAcceptMappingSuggestion={() => undefined}
@@ -589,7 +594,7 @@ describe('pantallas de facturas', () => {
           localDecisions={{}}
           mappingCatalog={{ products: [flour], loading: false, error: '' }}
           mappingDrafts={{
-            'line-liquid': { inventoryProductId: flour.id, approximateAccepted: false },
+            'line-liquid': reviewDraft(flour.id),
           }}
           mappingSuggestions={{ 'line-liquid': null }}
           result={{
@@ -619,7 +624,7 @@ describe('pantallas de facturas', () => {
         <InvoiceReview
           localDecisions={{}}
           mappingCatalog={catalog}
-          mappingDrafts={Object.fromEntries(manyLines.map((line) => [line.id, { inventoryProductId: '', approximateAccepted: false }]))}
+          mappingDrafts={Object.fromEntries(manyLines.map((line) => [line.id, reviewDraft('')]))}
           mappingSuggestions={Object.fromEntries(manyLines.map((line) => [line.id, null]))}
           result={{
             ...twoLitres,
@@ -643,7 +648,7 @@ describe('pantallas de facturas', () => {
           documentStatus="Revisada"
           localDecisions={{}}
           mappingCatalog={{ products: [{ id: 'p1', name: 'Cerveza', baseUnit: 'ml' }], loading: false, error: '' }}
-          mappingDrafts={{ 'line-pilsen': { inventoryProductId: 'p1', approximateAccepted: false } }}
+          mappingDrafts={{ 'line-pilsen': reviewDraft('p1') }}
           mode="saved"
           result={bonusInvoiceResult}
         />
