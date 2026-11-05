@@ -1,0 +1,139 @@
+{
+  "publicService": {
+    "supplier_name": "Servicio de Gas Demo SA",
+    "supplier_tax_id": "30-12345678-1",
+    "document_type": "Factura de servicio",
+    "document_number": "0001-00000001",
+    "issue_date": "2026-09-01",
+    "currency": "ARS",
+    "main_category": "public_service",
+    "subtotal": 100,
+    "tax": 27,
+    "total": 127,
+    "lines": [
+      { "description_original": "Cargo fijo gas natural", "quantity": 1, "unit": "service", "unit_price": 40, "amount": 40 },
+      { "description_original": "Consumo tramo 1", "quantity": 1, "unit": "service", "unit_price": 60, "amount": 60 }
+    ]
+  },
+  "foodInvoice": {
+    "supplier_name": "Distribuidora Alimentos Demo SA",
+    "supplier_tax_id": "30-12345678-1",
+    "document_type": "Factura A",
+    "document_number": "0002-00000010",
+    "issue_date": "2026-09-02",
+    "currency": "ARS",
+    "main_category": "gastronomic_merchandise",
+    "subtotal": 200,
+    "tax": 42,
+    "total": 242,
+    "lines": [
+      { "description_original": "Harina 000 bolsa 25 kg", "supplier_sku": "HAR-25", "quantity": 2, "unit": "u", "unit_price": 100, "amount": 200, "category": "Almacén" }
+    ]
+  },
+  "mixedInvoice": {
+    "supplier_name": "Abastecimiento Demo SA",
+    "supplier_tax_id": "30-12345678-1",
+    "document_type": "Factura A",
+    "document_number": "0003-00000020",
+    "issue_date": "2026-09-03",
+    "currency": "ARS",
+    "main_category": "gastronomic_merchandise",
+    "subtotal": 60,
+    "tax": 12.6,
+    "total": 72.6,
+    "lines": [
+      { "description_original": "Carne vacuna", "quantity": 10, "unit": "kg", "unit_price": 5, "amount": 50, "category": "Carnes" },
+      { "description_original": "Flete de entrega", "quantity": 1, "unit": "service", "unit_price": 10, "amount": 10 },
+      { "description_original": "IVA 21%", "amount": 12.6, "is_summary": true }
+    ]
+  },
+  "inconsistentAmounts": {
+    "supplier_name": "Proveedor Demo SA",
+    "supplier_tax_id": "30-12345678-1",
+    "document_type": "Factura A",
+    "document_number": "0004-00000030",
+    "issue_date": "2026-09-04",
+    "currency": "ARS",
+    "main_category": "gastronomic_merchandise",
+    "subtotal": 300,
+    "tax": 63,
+    "total": 363,
+    "lines": [
+      { "description_original": "Queso", "quantity": 2, "unit": "kg", "unit_price": 100, "amount": 300, "category": "Quesos" }
+    ]
+  },
+  "unknownPack": {
+    "supplier_name": "Mayorista Demo SA",
+    "supplier_tax_id": "30-12345678-1",
+    "document_type": "Factura A",
+    "document_number": "0005-00000040",
+    "issue_date": "2026-09-05",
+    "currency": "ARS",
+    "main_category": "gastronomic_merchandise",
+    "subtotal": 200,
+    "tax": 42,
+    "total": 242,
+    "lines": [
+      { "description_original": "Caja de café en grano", "package_count": 2, "unit": "caja", "unit_price": 100, "amount": 200, "category": "Almacén" }
+    ]
+  },
+  "ambiguousDocument": {
+    "supplier_name": "Proveedor General Demo",
+    "supplier_tax_id": "30-12345678-1",
+    "document_type": "Comprobante",
+    "document_number": "0006-00000050",
+    "issue_date": "2026-09-06",
+    "currency": "ARS",
+    "main_category": "ambiguous",
+    "subtotal": 80,
+    "total": 80,
+    "lines": [
+      { "description_original": "Concepto general", "quantity": 1, "unit": "u", "unit_price": 80, "amount": 80 }
+    ]
+  },
+  "unknownCategory": {
+    "supplier_name": "Proveedor Otro Demo",
+    "supplier_tax_id": "30-12345678-1",
+    "document_type": "Factura C",
+    "document_number": "0007-00000060",
+    "issue_date": "2026-09-07",
+    "currency": "ARS",
+    "main_category": "other",
+    "subtotal": 90,
+    "total": 90,
+    "lines": [
+      { "description_original": "Artículo X", "quantity": 1, "unit": "u", "unit_price": 90, "amount": 90 }
+    ]
+  },
+  "subtotalLine": {
+    "supplier_name": "Almacén Demo SA",
+    "supplier_tax_id": "30-12345678-1",
+    "document_type": "Factura A",
+    "document_number": "0008-00000070",
+    "issue_date": "2026-09-08",
+    "currency": "ARS",
+    "main_category": "gastronomic_merchandise",
+    "subtotal": 100,
+    "tax": 21,
+    "total": 121,
+    "lines": [
+      { "description_original": "Aceite", "quantity": 1, "unit": "l", "unit_price": 100, "amount": 100, "category": "Aceites" },
+      { "description_original": "Subtotal", "amount": 100, "is_summary": true }
+    ]
+  },
+  "contradictoryClassification": {
+    "supplier_name": "Servicio Público Demo SA",
+    "supplier_tax_id": "30-12345678-1",
+    "document_type": "Factura",
+    "document_number": "0009-00000080",
+    "issue_date": "2026-09-09",
+    "currency": "ARS",
+    "main_category": "public_service",
+    "subtotal": 100,
+    "tax": 21,
+    "total": 121,
+    "lines": [
+      { "description_original": "Harina 000", "quantity": 1, "unit": "kg", "unit_price": 100, "amount": 100, "category": "Almacén", "suitable_for_stock": true }
+    ]
+  }
+}

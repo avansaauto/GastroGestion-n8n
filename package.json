@@ -1,0 +1,22 @@
+{
+  "name": "senda-ops",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w @senda-ops/api\" \"npm run dev -w @senda-ops/web\"",
+    "dev:api": "npm run dev -w @senda-ops/api",
+    "dev:web": "npm run dev -w @senda-ops/web",
+    "build": "npm run build -w @senda-ops/api && npm run build -w @senda-ops/web",
+    "typecheck": "npm run typecheck -w @senda-ops/api && npm run typecheck -w @senda-ops/web",
+    "test": "npm run test -w @senda-ops/api && npm run test -w @senda-ops/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

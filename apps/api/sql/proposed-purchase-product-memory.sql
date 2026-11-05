@@ -1,0 +1,61 @@
+-- SENDA OPS — Paso 313
+-- PROPUESTA. NO EJECUTAR. NO APLICAR. Requiere aprobación explícita.
+--
+-- Propósito: memoria confirmada proveedor + concepto de factura → insumo + equivalencia.
+-- No es una receta de Fudo. No crea productos. No mueve stock.
+--
+-- Reutilizable hoy, sin esta tabla:
+--   purchase_documents.organization_id
+--   purchase_documents.issuer_tax_id_normalized  (CUIT validado del emisor)
+--   purchase_document_lines.mapping_status = 'mapped'
+--   purchase_document_lines.original_description / reviewed_description
+--   purchase_document_lines.inventory_product_id
+--   purchase_document_lines.inventory_physical_quantity
+--
+-- Limitaciones de reutilizar solo líneas mapeadas:
+--   - una corrección no reemplaza vinculaciones viejas del mismo CUIT+concepto
+--   - no hay description_normalized persistido
+--   - si el CUIT no se parseó (p. ej. punto de venta de 5 dígitos), no hay clave estable
+--
+-- product_purchase_formats existe, pero sus columnas no están confirmadas y el nombre
+-- apunta a formatos de compra (caja, pack), no a memoria proveedor+concepto.
+-- pending_product_mappings / sales_product_mappings son Fudo, no factura→insumo.
+--
+-- Esta tabla es el diseño mínimo si se quiere memoria explícita y corregible.
+
+-- create table if not exists public.purchase_product_memories (
+--   id uuid primary key default gen_random_uuid(),
+--   organization_id uuid not null references public.organizations(id),
+--   supplier_tax_id_normalized text not null,
+--   original_description text not null,
+--   description_normalized text not null,
+--   inventory_product_id uuid not null references public.inventory_products(id),
+--   conversion_factor numeric,
+--   confirmed_at timestamptz not null default now(),
+--   confirmed_by uuid,
+--   source_document_id uuid references public.purchase_documents(id),
+--   source_line_id uuid references public.purchase_document_lines(id),
+--   constraint purchase_product_memories_supplier_chk
+--     check (supplier_tax_id_normalized ~ '^[0-9]{11}$'),
+--   constraint purchase_product_memories_description_chk
+--     check (char_length(description_normalized) >= 2),
+--   constraint purchase_product_memories_factor_chk
+--     check (conversion_factor is null or conversion_factor > 0),
+--   constraint purchase_product_memories_unique
+--     unique (organization_id, supplier_tax_id_normalized, description_normalized)
+-- );
+--
+-- create index if not exists purchase_product_memories_org_supplier_idx
+--   on public.purchase_product_memories (organization_id, supplier_tax_id_normalized);
+--
+-- alter table public.purchase_product_memories enable row level security;
+-- alter table public.purchase_product_memories force row level security;
+--
+-- SELECT: miembros de la organización, vía JWT.
+-- INSERT/UPDATE/DELETE: solo service_role, disparado al confirmar
+-- senda_map_purchase_document_line. Nunca aprender de unmapped, rejected
+-- ni de una sugerencia no confirmada.
+-- Upsert por (organization_id, supplier_tax_id_normalized, description_normalized)
+-- para que una corrección reemplace la memoria anterior.
+--
+-- No escribir inventory_movements, location_inventory ni inventory_valuations.

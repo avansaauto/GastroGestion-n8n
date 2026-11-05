@@ -1,0 +1,127 @@
+{
+  "pilsenFullBonus": {
+    "supplier_name": "Cervecería Demo SA",
+    "supplier_tax_id": "30-12345678-1",
+    "document_type": "FACTURA A",
+    "document_number": "00007-00006046",
+    "issue_date": "2026-07-24",
+    "currency": "$",
+    "main_category": "gastronomic_merchandise",
+    "subtotal": 611032,
+    "tax": 128316.72,
+    "other_taxes": 53159.78,
+    "total": 792508.5,
+    "lines": [
+      { "description_original": "GOLDEN ALE LTS 100.00 1848.25 184825.00", "name": "GOLDEN ALE", "quantity": 100, "unit": "LTS", "unit_price": 1848.25, "amount": 184825 },
+      { "description_original": "HONEY LTS 50.00 2085.99 104299.50", "name": "HONEY", "quantity": 50, "unit": "LTS", "unit_price": 2085.99, "amount": 104299.5 },
+      { "description_original": "IPA LTS 100.00 2294.95 229495.00", "name": "IPA", "quantity": 100, "unit": "LTS", "unit_price": 2294.95, "amount": 229495 },
+      { "description_original": "PILSEN LTS 1.00 -82500.00 -82500.00", "name": "PILSEN", "quantity": 1, "unit": "LTS", "unit_price": -82500, "amount": -82500 },
+      { "description_original": "PILSEN LTS 50.00 1650.00 82500.00", "name": "PILSEN", "quantity": 50, "unit": "LTS", "unit_price": 1650, "amount": 82500 },
+      { "description_original": "RED ALE LTS 50.00 1848.25 92412.50", "name": "RED ALE", "quantity": 50, "unit": "LTS", "unit_price": 1848.25, "amount": 92412.5 },
+      { "description_original": "SUBTOTAL $ 611,032.00", "name": "SUBTOTAL", "amount": 611032, "is_summary": true },
+      { "description_original": "IVA 21% $ 128,316.72", "name": "IVA 21%", "amount": 128316.72, "tax_rate": 21, "is_summary": true },
+      { "description_original": "IMP.INT. 8.7% $ 53,159.78", "name": "IMP.INT.", "amount": 53159.78, "tax_rate": 8.7, "is_summary": true },
+      { "description_original": "TOTAL $ 792,508.50", "name": "TOTAL", "amount": 792508.5, "is_summary": true }
+    ]
+  },
+  "normalPurchase": {
+    "supplier_name": "Alimentos Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA A", "document_number": "0001-1", "issue_date": "2026-08-01", "currency": "ARS", "main_category": "gastronomic_merchandise",
+    "subtotal": 1000, "tax": 210, "total": 1210,
+    "lines": [{ "name": "Harina", "description_original": "Harina", "quantity": 10, "unit": "kg", "unit_price": 100, "amount": 1000 }]
+  },
+  "partialBonus": {
+    "supplier_name": "Alimentos Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA A", "document_number": "0001-2", "issue_date": "2026-08-02", "currency": "ARS", "main_category": "gastronomic_merchandise",
+    "subtotal": 800, "tax": 168, "total": 968,
+    "lines": [
+      { "name": "Harina", "description_original": "Harina", "quantity": 10, "unit": "kg", "unit_price": 100, "amount": 1000 },
+      { "name": "Bonificación Harina 20%", "description_original": "Bonificación Harina 20%", "quantity": 1, "unit": "u", "unit_price": -200, "amount": -200 }
+    ]
+  },
+  "freeUnits": {
+    "supplier_name": "Bebidas Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA A", "document_number": "0001-3", "issue_date": "2026-08-03", "currency": "ARS", "main_category": "gastronomic_merchandise",
+    "subtotal": 1000, "tax": 210, "total": 1210,
+    "lines": [
+      { "name": "Cerveza", "description_original": "Cerveza", "quantity": 10, "unit": "u", "unit_price": 100, "amount": 1000 },
+      { "name": "Cerveza sin cargo", "description_original": "Cerveza sin cargo", "quantity": 2, "unit": "u", "unit_price": 0, "amount": 0 }
+    ]
+  },
+  "globalDiscount": {
+    "supplier_name": "Alimentos Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA A", "document_number": "0001-4", "issue_date": "2026-08-04", "currency": "ARS", "main_category": "gastronomic_merchandise",
+    "subtotal": 900, "tax": 189, "total": 1089,
+    "lines": [
+      { "name": "Harina", "description_original": "Harina", "quantity": 10, "unit": "kg", "unit_price": 100, "amount": 1000 },
+      { "name": "Descuento global", "description_original": "Descuento global", "quantity": 1, "unit": "u", "unit_price": -100, "amount": -100 }
+    ]
+  },
+  "unknownNegative": {
+    "supplier_name": "Proveedor Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA A", "document_number": "0001-5", "issue_date": "2026-08-05", "currency": "ARS", "main_category": "gastronomic_merchandise",
+    "subtotal": 950, "tax": 199.5, "total": 1149.5,
+    "lines": [
+      { "name": "Harina", "description_original": "Harina", "quantity": 10, "unit": "kg", "unit_price": 100, "amount": 1000 },
+      { "name": "Ajuste comercial", "description_original": "Ajuste comercial", "quantity": 1, "unit": "u", "unit_price": -50, "amount": -50 }
+    ]
+  },
+  "realReturn": {
+    "supplier_name": "Proveedor Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA A", "document_number": "0001-6", "issue_date": "2026-08-06", "currency": "ARS", "main_category": "gastronomic_merchandise",
+    "subtotal": -200, "tax": -42, "total": -242,
+    "lines": [{ "name": "Devolución Harina", "description_original": "Devolución Harina", "quantity": 2, "unit": "kg", "unit_price": -100, "amount": -200 }]
+  },
+  "creditNote": {
+    "supplier_name": "Proveedor Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "NOTA DE CRÉDITO A", "document_number": "0001-7", "issue_date": "2026-08-07", "currency": "ARS", "main_category": "gastronomic_merchandise",
+    "subtotal": -200, "tax": -42, "total": -242,
+    "lines": [{ "name": "Harina", "description_original": "Harina", "quantity": 2, "unit": "kg", "unit_price": -100, "amount": -200 }]
+  },
+  "bonusWithFreight": {
+    "supplier_name": "Proveedor Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA A", "document_number": "0001-8", "issue_date": "2026-08-08", "currency": "ARS", "main_category": "gastronomic_merchandise",
+    "subtotal": 950, "tax": 199.5, "total": 1149.5,
+    "lines": [
+      { "name": "Aceite", "description_original": "Aceite", "quantity": 10, "unit": "l", "unit_price": 100, "amount": 1000 },
+      { "name": "Bonificación Aceite", "description_original": "Bonificación Aceite", "quantity": 1, "unit": "u", "unit_price": -100, "amount": -100 },
+      { "name": "Flete", "description_original": "Flete", "quantity": 1, "unit": "service", "unit_price": 50, "amount": 50 }
+    ]
+  },
+  "publicService": {
+    "supplier_name": "Servicio de Gas Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA DE SERVICIO", "document_number": "0001-9", "issue_date": "2026-08-09", "currency": "ARS", "main_category": "public_service",
+    "subtotal": 100, "tax": 27, "total": 127,
+    "lines": [{ "name": "Cargo fijo gas natural", "description_original": "Cargo fijo gas natural", "quantity": 1, "unit": "service", "unit_price": 100, "amount": 100 }]
+  },
+  "ordinaryTaxes": {
+    "supplier_name": "Cervecería Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA A", "document_number": "0001-10", "issue_date": "2026-08-10", "currency": "$", "main_category": "gastronomic_merchandise",
+    "subtotal": 1000, "tax": 210, "other_taxes": 87, "total": 1297,
+    "lines": [
+      { "name": "Cerveza", "description_original": "Cerveza", "quantity": 10, "unit": "l", "unit_price": 100, "amount": 1000 },
+      { "name": "IVA 21%", "description_original": "IVA 21%", "amount": 210, "is_summary": true },
+      { "name": "IMP.INT. 8.7%", "description_original": "IMP.INT. 8.7%", "amount": 87, "is_summary": true }
+    ]
+  },
+  "ambiguousCurrency": {
+    "supplier_name": "Consultora Demo", "document_type": "RECIBO", "document_number": "R-1", "issue_date": "2026-08-11", "currency": "$", "main_category": "administrative_expense",
+    "subtotal": 100, "total": 100,
+    "lines": [{ "name": "Honorarios", "description_original": "Honorarios", "quantity": 1, "unit": "service", "unit_price": 100, "amount": 100 }]
+  },
+  "similarProducts": {
+    "supplier_name": "Bebidas Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA A", "document_number": "0001-12", "issue_date": "2026-08-12", "currency": "ARS", "main_category": "gastronomic_merchandise",
+    "subtotal": 1000, "tax": 210, "total": 1210,
+    "lines": [
+      { "name": "Cerveza IPA", "description_original": "Cerveza IPA", "quantity": 5, "unit": "l", "unit_price": 100, "amount": 500 },
+      { "name": "Cerveza ROJA", "description_original": "Cerveza ROJA", "quantity": 6, "unit": "l", "unit_price": 100, "amount": 600 },
+      { "name": "Bonificación Cerveza", "description_original": "Bonificación Cerveza", "quantity": 1, "unit": "u", "unit_price": -100, "amount": -100 }
+    ]
+  },
+  "positiveQuantityNegativeAmount": {
+    "supplier_name": "Lácteos Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA A", "document_number": "0001-13", "issue_date": "2026-08-13", "currency": "ARS", "main_category": "gastronomic_merchandise",
+    "subtotal": 900, "tax": 189, "total": 1089,
+    "lines": [
+      { "name": "Queso", "description_original": "Queso", "quantity": 10, "unit": "kg", "unit_price": 100, "amount": 1000 },
+      { "name": "Queso", "description_original": "Queso", "quantity": 1, "unit": "kg", "unit_price": -100, "amount": -100 }
+    ]
+  },
+  "mathCorrectCommerciallyAmbiguous": {
+    "supplier_name": "Proveedor Demo SA", "supplier_tax_id": "30-12345678-1", "document_type": "FACTURA A", "document_number": "0001-14", "issue_date": "2026-08-14", "currency": "ARS", "main_category": "gastronomic_merchandise",
+    "subtotal": 950, "tax": 199.5, "total": 1149.5,
+    "lines": [
+      { "name": "Aceite", "description_original": "Aceite", "quantity": 10, "unit": "l", "unit_price": 100, "amount": 1000 },
+      { "name": "Crédito comercial", "description_original": "Crédito comercial", "quantity": 1, "unit": "u", "unit_price": -50, "amount": -50 }
+    ]
+  }
+}

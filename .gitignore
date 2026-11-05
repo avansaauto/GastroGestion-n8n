@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+coverage/
+apps/api/.local/
+# Variables privadas de todos los entornos
+.env.*
+!.env.example

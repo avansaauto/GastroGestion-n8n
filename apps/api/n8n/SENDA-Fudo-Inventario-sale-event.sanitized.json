@@ -1,0 +1,1253 @@
+{
+  "name": "SENDA - Fudo Inventario (sale-event piloto)",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        144
+      ],
+      "id": "6c44b1aa-2d0b-410c-b2a0-ef01bc15ae4f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8cb5b71-3bb1-4b0f-9799-9920288ea0b7",
+              "name": "venta_id",
+              "value": "={{$('Preparar Item').item.json.venta_id}}",
+              "type": "string"
+            },
+            {
+              "id": "5aa7724f-3ecd-484e-ae14-5cc56fcf4e65",
+              "name": "item_id",
+              "value": "={{$('Preparar Item').item.json.item_id}}",
+              "type": "string"
+            },
+            {
+              "id": "8a60504f-4932-487c-bf0b-2a3a72e64660",
+              "name": "producto_id",
+              "value": "={{ $json.data.id }}",
+              "type": "string"
+            },
+            {
+              "id": "9590e12e-8bbf-4f7a-b1f2-de3c95127078",
+              "name": "producto",
+              "value": "={{ $json.data.attributes.name }}",
+              "type": "string"
+            },
+            {
+              "id": "6113bac2-b49f-48cb-a9c6-74255040f290",
+              "name": "cantidad",
+              "value": "={{ $('Preparar Item').item.json.cantidad }}",
+              "type": "number"
+            },
+            {
+              "id": "cd664d00-95ba-4112-bb32-d5058bfa2e63",
+              "name": "precio",
+              "value": "={{ $('Preparar Item').item.json.precio }}",
+              "type": "number"
+            },
+            {
+              "id": "c9b93919-14c2-49e0-8946-c49ff73a5625",
+              "name": "canceled",
+              "value": "={{ (() => { const v = $('Preparar Item').item.json.canceled; if (typeof v === 'boolean') return v; const s = String(v ?? '').trim().toLowerCase(); return s === 'true' || s === '1'; })() }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        800,
+        -80
+      ],
+      "id": "4b822475-e4ff-4c05-92db-1c75a3e3faa1",
+      "name": "Preparar Venta"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.fu.do/v1alpha1/items/{{ $json.item_id }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": []
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fudo - Token').first().json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        -240
+      ],
+      "id": "1184ced4-1f41-4b38-a3fa-6668e16934b7",
+      "name": "Fudo - Obtener Item"
+    },
+    {
+      "parameters": {
+        "url": "={{ (() => { const c = $('Config Piloto').first().json; const single = c.PILOT_SINGLE_ITEM === true || String(c.PILOT_SINGLE_ITEM).toLowerCase() === 'true'; const id = String(c.PILOT_EXTERNAL_SALE_ID || '').trim(); return single && id ? `https://api.fu.do/v1alpha1/sales/${id}` : 'https://api.fu.do/v1alpha1/sales'; })() }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "page[size]",
+              "value": "={{ (() => { const c = $('Config Piloto').first().json; const single = c.PILOT_SINGLE_ITEM === true || String(c.PILOT_SINGLE_ITEM).toLowerCase() === 'true'; return single ? '1' : '20'; })() }}"
+            },
+            {
+              "name": "sort",
+              "value": "-createdAt"
+            },
+            {
+              "name": "filter[createdAt]",
+              "value": "={{ (() => { const c = $('Config Piloto').first().json; const on = c.FUDO_API_CREATED_AT_FILTER === true || String(c.FUDO_API_CREATED_AT_FILTER).toLowerCase() === 'true'; const start = String(c.PILOT_START_ISO || '').trim(); const single = c.PILOT_SINGLE_ITEM === true || String(c.PILOT_SINGLE_ITEM).toLowerCase() === 'true'; return on && start && !single ? `gte.${start}` : undefined; })() }}"
+            },
+            {
+              "name": "filter[saleState]",
+              "value": "={{ (() => { const c = $('Config Piloto').first().json; const on = c.FUDO_API_SALE_STATE_FILTER === true || String(c.FUDO_API_SALE_STATE_FILTER).toLowerCase() === 'true'; const states = String(c.PILOT_ALLOWED_SALE_STATES || '').trim(); const single = c.PILOT_SINGLE_ITEM === true || String(c.PILOT_SINGLE_ITEM).toLowerCase() === 'true'; return on && states && !single ? `in.(${states})` : undefined; })() }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fudo - Token').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -384,
+        368
+      ],
+      "id": "cf7022f1-493b-4fce-bc1e-5bd4fcf89bb7",
+      "name": "Fudo - Obtener Ventas",
+      "notes": "Listado o GET /sales/{id} en single-item. Filtros API solo si FUDO_API_*_FILTER=true tras probe. El corte real está en Separar Ventas (local).",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://auth.fu.do/api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "options": {},
+        "jsonBody": "={{({ apiKey: $credentials.fudoApi.apiKey, apiSecret: $credentials.fudoApi.apiSecret })}}"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -368,
+        144
+      ],
+      "id": "21b236d7-d3fa-42de-8c7b-7502cb0924bb",
+      "name": "Fudo - Token",
+      "notes": "Credencial Fudo en n8n. Sin secretos en el JSON.",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "url": "=https://api.fu.do/v1alpha1/products/{{ $json.product_id }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": []
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Fudo - Token').first().json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        720,
+        -240
+      ],
+      "id": "fd7f0add-ce4a-4e04-95ce-528a64380f28",
+      "name": "Fudo - Obtener Producto"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        192,
+        144
+      ],
+      "id": "cc3b7113-10c1-4496-9423-2bc27828ff99",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Ítem omitido (cancelado)",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -64
+      ],
+      "id": "42b6d887-7b35-4c82-b747-55864e4319a5",
+      "placeholder": true,
+      "notes": "Vuelve al loop sin descontar. Cancelaciones/devoluciones sin reverso automático.",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Piloto seguro: filtros locales fail-closed.\n// Política fecha: PILOT_DATE_FIELD=createdAt → ventas abiertas antes del piloto\n// y cerradas después QUEDAN FUERA (no se procesan históricas).\n// Cursor incremental / schedule: NO activados.\n\nconst cfg = $('Config Piloto').first().json;\nconst LOCATION_ID = String(cfg.LOCATION_ID || '').trim();\nconst PILOT_START_ISO = String(cfg.PILOT_START_ISO || '').trim();\nconst DATE_FIELD = String(cfg.PILOT_DATE_FIELD || 'createdAt').trim() || 'createdAt';\nconst ALLOWED = String(cfg.PILOT_ALLOWED_SALE_STATES || '')\n  .split(',')\n  .map(s => s.trim())\n  .filter(Boolean);\nconst single =\n  cfg.PILOT_SINGLE_ITEM === true ||\n  String(cfg.PILOT_SINGLE_ITEM).toLowerCase() === 'true';\nconst SALE_ID = String(cfg.PILOT_EXTERNAL_SALE_ID || '').trim();\nconst ITEM_ID = String(cfg.PILOT_EXTERNAL_ITEM_ID || '').trim();\n\nif (!LOCATION_ID) throw new Error('LOCATION_ID_REQUIRED');\nif (single) {\n  if (!SALE_ID || !ITEM_ID) throw new Error('PILOT_SINGLE_ITEM_REQUIRES_SALE_AND_ITEM_IDS');\n} else if (!PILOT_START_ISO) {\n  throw new Error('PILOT_START_ISO_REQUIRED');\n}\n\nconst root = $input.first().json;\nlet data = [];\nif (Array.isArray(root?.data)) data = root.data;\nelse if (root?.data?.id) data = [root.data];\n\nconst ventas = [];\nfor (const venta of data) {\n  const id = String(venta.id ?? '');\n  const attrs = venta.attributes || {};\n  const created = attrs.createdAt || attrs.created_at || null;\n  const closed = attrs.closedAt || attrs.closed_at || null;\n  const saleState = attrs.saleState || attrs.sale_state || null;\n\n  if (single) {\n    if (id !== SALE_ID) continue;\n  } else {\n    const dateVal = DATE_FIELD === 'closedAt' ? closed : created;\n    if (!dateVal || String(dateVal) < PILOT_START_ISO) continue;\n    if (ALLOWED.length) {\n      if (!saleState || !ALLOWED.includes(String(saleState))) continue;\n    }\n  }\n\n  ventas.push({\n    json: {\n      venta_id: id,\n      items: venta.relationships?.items?.data || [],\n      created_at: created,\n      closed_at: closed,\n      sale_state: saleState,\n      location_id: LOCATION_ID,\n      pilot_external_item_id: single ? ITEM_ID : null,\n    },\n  });\n}\n\nif (single && ventas.length === 0) {\n  throw new Error('PILOT_SALE_NOT_IN_RESPONSE:' + SALE_ID);\n}\n\n// Cursor incremental preparado (NO activar):\n// const staticData = $getWorkflowStaticData('global');\n// if (ventas.length) {\n//   const newest = ventas.map(v => v.json.created_at).filter(Boolean).sort().at(-1);\n//   if (newest) staticData.last_sale_created_at = newest;\n// }\n\nreturn ventas;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        368
+      ],
+      "id": "e9e62008-da41-40fe-9958-89f7e421bbae",
+      "name": "Separar Ventas",
+      "notes": "Filtro local fail-closed (fecha + saleState + single item). Cursor incremental comentado.",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const cfg = $('Config Piloto').first().json;\nconst single =\n  cfg.PILOT_SINGLE_ITEM === true ||\n  String(cfg.PILOT_SINGLE_ITEM).toLowerCase() === 'true';\nconst onlyItem = String(cfg.PILOT_EXTERNAL_ITEM_ID || '').trim();\nconst resultado = [];\n\nfor (const entrada of $input.all()) {\n  const ventaId = entrada.json.venta_id;\n  const items = entrada.json.items || [];\n  for (const item of items) {\n    const itemId = String(item.id ?? '');\n    if (single && onlyItem && itemId !== onlyItem) continue;\n    resultado.push({\n      json: {\n        venta_id: ventaId,\n        item_id: itemId,\n        location_id: entrada.json.location_id || cfg.LOCATION_ID,\n        sale_state: entrada.json.sale_state ?? null,\n        created_at: entrada.json.created_at ?? null,\n        closed_at: entrada.json.closed_at ?? null,\n      },\n    });\n  }\n}\n\nif (single && resultado.length === 0) {\n  throw new Error('PILOT_ITEM_NOT_IN_SALE:' + onlyItem);\n}\n\nreturn resultado;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        368
+      ],
+      "id": "b360ab3e-7afe-46db-ab68-4a1244fa952c",
+      "name": "Separar Items",
+      "notes": "Con PILOT_SINGLE_ITEM emite solo PILOT_EXTERNAL_ITEM_ID (no basta page[size]=1).",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5cb149d7-0d1e-4961-98f9-56f91b141b9e",
+              "name": "venta_id",
+              "value": "={{ $json.data.relationships.sale.data.id }}",
+              "type": "string"
+            },
+            {
+              "id": "e840118f-aee8-411f-8e46-174f1557b281",
+              "name": "item_id",
+              "value": "={{ $json.data.id }}",
+              "type": "string"
+            },
+            {
+              "id": "ce285652-3206-4a4f-a905-0d64a7c73aee",
+              "name": "product_id",
+              "value": "={{ $json.data.relationships.product.data.id }}",
+              "type": "string"
+            },
+            {
+              "id": "ed101f85-442d-439c-8599-2e6980044000",
+              "name": "cantidad",
+              "value": "={{ $json.data.attributes.quantity }}",
+              "type": "string"
+            },
+            {
+              "id": "516493f6-107a-4adf-810a-903e06c817bd",
+              "name": "precio",
+              "value": "={{ $json.data.attributes.price }}",
+              "type": "string"
+            },
+            {
+              "id": "238931af-6874-47c2-bb71-cf887f1f79da",
+              "name": "canceled",
+              "value": "={{ (() => { const v = $json.data.attributes.canceled; if (typeof v === 'boolean') return v; const s = String(v ?? '').trim().toLowerCase(); return s === 'true' || s === '1'; })() }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        576,
+        -80
+      ],
+      "id": "3014bb42-cd0d-40f5-9b9a-dec24817addc",
+      "name": "Preparar Item"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3a8689be-c169-4e5a-856d-048d24b4bc0b",
+              "leftValue": "={{ $json.canceled }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        224
+      ],
+      "id": "c137698d-2d86-4773-ad6b-bceafa3f853b",
+      "name": "¿Item cancelado?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const productos = new Map();\n\nfor (const item of $input.all()) {\n  const venta = item.json;\n  const id = String(venta.producto_id);\n\n  if (!productos.has(id)) {\n    productos.set(id, {\n      producto_id: id,\n      producto: venta.producto,\n      unidades_vendidas: 0\n    });\n  }\n\n  productos.get(id).unidades_vendidas += Number(venta.cantidad);\n}\n\nreturn Array.from(productos.values()).map(producto => ({\n  json: producto\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        -336
+      ],
+      "id": "a59eab06-1ad4-4c2c-9311-34b0d1a99e38",
+      "name": "Revisar Producto Fudo"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "getAll",
+        "projectRef": "yuggbxudurkfjgsnvzkd",
+        "tableId": "sales_product_mappings",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "external_product_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.producto_id }}"
+            },
+            {
+              "keyName": "source",
+              "condition": "eq",
+              "keyValue": "fudo"
+            },
+            {
+              "keyName": "location_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Config Piloto').first().json.LOCATION_ID }}"
+            },
+            {
+              "keyName": "active",
+              "condition": "eq",
+              "keyValue": "true"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        896,
+        144
+      ],
+      "id": "be4a1ac1-9590-41d7-8612-d95556c60fd4",
+      "name": "Buscar Receta SENDA",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseOAuth2Api": {
+          "id": "5xK8k9GzGAGYUk1I",
+          "name": "Supabase account"
+        }
+      },
+      "notes": "Fuente = sales_product_mappings. location_id desde Config Piloto (Barrio Chino).",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "getAll",
+        "projectRef": "yuggbxudurkfjgsnvzkd",
+        "tableId": "recipe_components",
+        "returnAll": true,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "recipe_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.recipe_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        128
+      ],
+      "id": "8c1554f5-7aaf-401e-b06a-4a22fc4ec181",
+      "name": "Obtener Componentes Receta",
+      "credentials": {
+        "supabaseOAuth2Api": {
+          "id": "5xK8k9GzGAGYUk1I",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "89b38c14-015b-4fc7-a68c-02472eff02c2",
+              "name": "consumo_total",
+              "value": "={{ -Number($json.quantity) * Number($('¿Es Coca Cola Zero?').item.json.cantidad) }}",
+              "type": "number"
+            },
+            {
+              "id": "62e57a03-8aaf-4624-899c-c8f940a7cf47",
+              "name": "venta_id",
+              "value": "={{ $('¿Es Coca Cola Zero?').item.json.venta_id }}",
+              "type": "string"
+            },
+            {
+              "id": "a5422a92-0c63-4bba-a566-4abced3603cc",
+              "name": "item_id",
+              "value": "={{ $('¿Es Coca Cola Zero?').item.json.item_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1744,
+        -336
+      ],
+      "id": "2bea97bd-2eb0-4f7b-aaeb-09d2114060e2",
+      "name": "Calcular Consumo"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "40a69af9-7be4-4e1e-9c97-7f724a8478dd",
+              "leftValue": "=\n{{ String($json.producto_id ?? '').trim() }}",
+              "rightValue": "183",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        768,
+        336
+      ],
+      "id": "7c008539-e730-45e6-9b2b-9576f0bacb7c",
+      "name": "DEPRECADO - ¿Es Coca Cola Zero?",
+      "notes": "Eliminado del flujo: era notEmpty(producto_id), no comparaba con 183.",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "getAll",
+        "projectRef": "yuggbxudurkfjgsnvzkd",
+        "tableId": "location_inventory",
+        "limit": 1,
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "inventory_product_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.inventory_product_id }}"
+            },
+            {
+              "keyName": "location_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Config Piloto').first().json.LOCATION_ID }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        128
+      ],
+      "id": "1779003b-4ed1-419f-a391-0118850bd785",
+      "name": "Buscar Inventario Local",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseOAuth2Api": {
+          "id": "5xK8k9GzGAGYUk1I",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d83b4b4a-72af-4f11-9aa9-f6e2102abaa0",
+              "name": "location_inventory_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "9ba3e971-0a1a-499f-99a1-0a2c96e66bb6",
+              "name": "movement_type",
+              "value": "sale",
+              "type": "string"
+            },
+            {
+              "id": "c16614b0-4086-4f14-8950-803504f70801",
+              "name": "quantity",
+              "value": "={{ Number($('Calcular Consumo').item.json.consumo_total) }}",
+              "type": "number"
+            },
+            {
+              "id": "818159f0-ca9d-4e7f-8a0b-d7d80bf1de43",
+              "name": "source_type",
+              "value": "fudo",
+              "type": "string"
+            },
+            {
+              "id": "955fb98f-a772-4552-bb01-22c524ebf7f4",
+              "name": "source_id",
+              "value": "={{ $('Calcular Consumo').item.json.item_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2048,
+        -320
+      ],
+      "id": "12c4da06-d1ed-4589-a508-9b34d4a41a19",
+      "name": "Preparar Movimientos"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yuggbxudurkfjgsnvzkd.supabase.co/rest/v1/rpc/senda_register_sale_consumption_event",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{({ p: $json })}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2256,
+        144
+      ],
+      "id": "9591f7b7-0c37-44c5-885e-865f6b8903a2",
+      "name": "Registrar Evento Consumo SENDA - RPC",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "g66rhcmJgGKpKVVl",
+          "name": "Supabase SENDA - RPC"
+        }
+      },
+      "notes": "DESHABILITADO. Reconectar Dry-run → este nodo → Loop al autorizar escrituras. body { p: $json }. source_id=item_id.",
+      "notesInFlow": true,
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const venta = $('Preparar Venta').item.json;\nconst recetas = $input.all().map(item => item.json);\nconst mapping =\n  recetas.find(r =>\n    r.recipe_id &&\n    String(r.external_product_id) === String(venta.producto_id)\n  ) ?? null;\nconst recipeId = mapping?.recipe_id ?? null;\n\nreturn [{\n  json: {\n    ...venta,\n    recipe_id: recipeId,\n    recipe_name: mapping?.recipe_name ?? venta.producto ?? null,\n    tiene_receta: recipeId !== null,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        144
+      ],
+      "id": "76c2e0e9-7acf-4cdb-bf1e-347fe69042ed",
+      "name": "Cruzar Ventas y Recetas"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ece92534-7b94-4cf7-82cb-0416af69b82a",
+              "leftValue": "={{ $json.recipe_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1264,
+        336
+      ],
+      "id": "4da644a5-3c17-43fc-aa82-da20107a2d09",
+      "name": "¿Tiene receta?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const venta = $('Cruzar Ventas y Recetas').item.json;\nif (!venta?.recipe_id) return [];\n\nconst componentes = $input.all().map(item => item.json);\nconst componentesUnicos = new Map();\nfor (const componente of componentes) {\n  if (componente.id && componente.recipe_id) {\n    componentesUnicos.set(componente.id, componente);\n  }\n}\n\nconst resultados = [];\nfor (const componente of componentesUnicos.values()) {\n  if (String(componente.recipe_id) !== String(venta.recipe_id)) continue;\n  resultados.push({\n    json: {\n      venta_id: venta.venta_id,\n      item_id: venta.item_id,\n      producto_id: venta.producto_id,\n      producto: venta.producto,\n      cantidad_vendida: Number(venta.cantidad),\n      recipe_id: venta.recipe_id,\n      recipe_name: venta.recipe_name ?? venta.producto ?? null,\n      inventory_product_id: componente.inventory_product_id,\n      consumo_total: -Number(componente.quantity) * Number(venta.cantidad),\n    },\n  });\n}\nreturn resultados;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        128
+      ],
+      "id": "971e14b5-be4b-4101-8432-fef21a1cdc3c",
+      "name": "Calcular Consumo Multi"
+    },
+    {
+      "parameters": {
+        "jsCode": "// SENDA — Preparar Evento Consumo (1 ítem Fudo → 1 RPC event)\n// source_id = item_id (idempotencia). location = Config Piloto.\n\nconst cfg = $('Config Piloto').first().json;\nconst LOCATION_ID = String(cfg.LOCATION_ID || '').trim();\nif (!LOCATION_ID) throw new Error('LOCATION_ID_REQUIRED');\n\nconst consumos = $('Calcular Consumo Multi').all().map(i => i.json);\nconst inventarios = $input.all().map(i => i.json);\nconst itemActual = String(consumos[0]?.item_id ?? '').trim();\nconst consumosItem = itemActual\n  ? consumos.filter(c => String(c.item_id) === itemActual)\n  : consumos;\n\nconst inventariosPorProducto = new Map();\nfor (const inv of inventarios) {\n  if (inv.id && inv.inventory_product_id) {\n    inventariosPorProducto.set(String(inv.inventory_product_id), inv);\n  }\n}\n\nconst porItem = new Map();\n\nfor (const c of consumosItem) {\n  const itemId = String(c.item_id ?? '').trim();\n  const ventaId = String(c.venta_id ?? '').trim();\n  const productoId = String(c.producto_id ?? '').trim();\n  const soldQty = Number(c.cantidad_vendida);\n  const qty = Number(c.consumo_total);\n  const productKey = String(c.inventory_product_id ?? '').trim();\n\n  if (!itemId) throw new Error('MISSING_ITEM_ID');\n  if (!ventaId) throw new Error('MISSING_SALE_ID');\n  if (!productoId) throw new Error('MISSING_PRODUCT_ID');\n  if (!Number.isFinite(soldQty) || soldQty <= 0) throw new Error('INVALID_SOLD_QUANTITY');\n  if (!Number.isFinite(qty) || qty >= 0) throw new Error('INVALID_CONSUMPTION_QTY');\n  if (!productKey) throw new Error('MISSING_INVENTORY_PRODUCT');\n\n  const inv = inventariosPorProducto.get(productKey);\n  if (!inv || !inv.id) throw new Error('INVENTORY_NOT_FOUND:' + productKey);\n  if (String(inv.location_id) !== LOCATION_ID) {\n    throw new Error('INVENTORY_LOCATION_MISMATCH');\n  }\n\n  let acc = porItem.get(itemId);\n  if (!acc) {\n    acc = {\n      venta_id: ventaId,\n      item_id: itemId,\n      producto_id: productoId,\n      producto: c.producto != null ? String(c.producto) : null,\n      cantidad_vendida: soldQty,\n      recipe_id: c.recipe_id != null ? String(c.recipe_id) : null,\n      recipe_name: c.recipe_name != null ? String(c.recipe_name) : null,\n      lines: new Map(),\n    };\n    porItem.set(itemId, acc);\n  }\n\n  const prev = acc.lines.get(inv.id) || 0;\n  acc.lines.set(inv.id, prev + qty);\n}\n\nconst eventos = [];\nfor (const acc of porItem.values()) {\n  const lines = [...acc.lines.entries()].map(([location_inventory_id, quantity]) => ({\n    location_inventory_id,\n    quantity,\n  }));\n  if (lines.length === 0) throw new Error('EMPTY_LINES');\n\n  eventos.push({\n    json: {\n      location_id: LOCATION_ID,\n      source_type: 'fudo',\n      source_id: acc.item_id,\n      external_sale_id: acc.venta_id,\n      external_item_id: acc.item_id,\n      external_product_id: acc.producto_id,\n      external_product_name: acc.producto,\n      recipe_id: acc.recipe_id,\n      recipe_name: acc.recipe_name,\n      sold_quantity: acc.cantidad_vendida,\n      sold_unit: 'unit',\n      lines,\n    },\n  });\n}\n\nreturn eventos;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2048,
+        128
+      ],
+      "id": "bc944969-9a08-482b-96a7-619fb519eaa4",
+      "name": "Preparar Evento Consumo"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn $input.all().map(item => ({\n  json: {\n    estado: 'pendiente_receta',\n    producto: item.json.producto,\n    producto_id: item.json.producto_id,\n    venta_id: item.json.venta_id,\n    item_id: item.json.item_id,\n    motivo: 'Producto sin receta asociada'\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        352
+      ],
+      "id": "7309a4d0-def1-408f-be37-05769052306d",
+      "name": "Identificar Sin Receta"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst pendientes = $input.all().map(item => item.json);\n\nconst productos = new Map();\n\nfor (const pendiente of pendientes) {\n  const id = String(pendiente.producto_id);\n\n  if (!productos.has(id)) {\n    productos.set(id, {\n      estado: 'pendiente_receta',\n      producto_id: id,\n      producto: pendiente.producto,\n      cantidad_items: 0,\n      item_ids: []\n    });\n  }\n\n  const producto = productos.get(id);\n\n  producto.cantidad_items += 1;\n  producto.item_ids.push(pendiente.item_id);\n}\n\n\nreturn [...productos.values()]\n  .sort((a, b) => b.cantidad_items - a.cantidad_items)\n  .map(producto => ({\n    json: producto\n  }));\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        352
+      ],
+      "id": "a3a1cf56-1304-425e-9a5f-36f813be9d03",
+      "name": "Agrupar Productos Sin Receta"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yuggbxudurkfjgsnvzkd.supabase.co/rest/v1/pending_product_mappings?on_conflict=location_id,source,external_product_id",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "resolution=merge-duplicates,missing=default,return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=\n{\n  \"location_id\": \"{{ $('Config Piloto').first().json.LOCATION_ID }}\",\n  \"source\": \"fudo\",\n  \"external_product_id\": \"{{ $json.producto_id }}\",\n  \"external_product_name\": \"{{ $json.producto }}\",\n  \"last_seen_at\": \"{{ $now.toISO() }}\"\n}\n",
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1920,
+        352
+      ],
+      "id": "0a0e9a50-4172-42cd-a997-ee49969eeca8",
+      "name": "Guardar Productos Pendientes - Upsert",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "g66rhcmJgGKpKVVl",
+          "name": "Supabase SENDA - RPC"
+        }
+      },
+      "disabled": true,
+      "notes": "DESHABILITADO en piloto de lectura. location_id desde Config Piloto.",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yuggbxudurkfjgsnvzkd.supabase.co/rest/v1/rpc/resolve_pending_product_mappings",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        2144,
+        352
+      ],
+      "id": "d5275c07-906f-4d6d-aff0-af3e7d139c23",
+      "name": "Resolver Productos Pendientes - RPC",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "executeOnce": true,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "g66rhcmJgGKpKVVl",
+          "name": "Supabase SENDA - RPC"
+        }
+      },
+      "disabled": true,
+      "notes": "DESHABILITADO en piloto de lectura.",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {},
+      "id": "930bd41f-92f8-4f19-b57c-ccec6e954919",
+      "name": "Fin del lote (done)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        420,
+        40
+      ],
+      "notes": "Salida done del SplitInBatches. Opcional: enganchar métricas.",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "content": "## Sync incremental (NO activar)\n1. Schedule en lugar de Manual.\n2. Paginar `page[number]`.\n3. Activar cursor `last_sale_created_at` tras run OK con RPC.\n4. Política piloto: corte por **createdAt** (no closedAt) → no reprocesa tickets abiertos antes del piloto.",
+        "height": 240,
+        "width": 360
+      },
+      "id": "b9acbdb4-a90f-4b49-b30d-0eda00318fcf",
+      "name": "NOTA — Sync incremental",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e5a88b76-2d33-46e5-8417-5000a4d93eb8",
+              "name": "LOCATION_ID",
+              "value": "d8d78b7d-eec5-4e90-8f2d-98268a875d00",
+              "type": "string"
+            },
+            {
+              "id": "ef31bc9d-1af3-49f0-9b10-32b8547844b9",
+              "name": "LOCATION_NAME",
+              "value": "OGHAM Barrio Chino",
+              "type": "string"
+            },
+            {
+              "id": "caa658a1-a388-48f9-8ca6-79aef63747f7",
+              "name": "PILOT_START_ISO",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "f8bf5701-2505-412b-82f5-b4962fd57c05",
+              "name": "PILOT_DATE_FIELD",
+              "value": "createdAt",
+              "type": "string"
+            },
+            {
+              "id": "2c0053ab-be3e-4b8c-ac38-7a7dd9a0734f",
+              "name": "PILOT_ALLOWED_SALE_STATES",
+              "value": "CLOSED",
+              "type": "string"
+            },
+            {
+              "id": "8c1b858a-8c69-43b8-bc18-bf833e52a3b0",
+              "name": "PILOT_SINGLE_ITEM",
+              "value": true,
+              "type": "boolean"
+            },
+            {
+              "id": "bfda95b1-9b46-4640-b375-8282c775c037",
+              "name": "PILOT_EXTERNAL_SALE_ID",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "301bda99-ff08-48ec-a82c-df251f132518",
+              "name": "PILOT_EXTERNAL_ITEM_ID",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "f44fcd98-63ce-4001-ba0d-f66f4908e5de",
+              "name": "FUDO_API_CREATED_AT_FILTER",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "c91524f3-e84e-496c-b2e4-3bbaa2c8c429",
+              "name": "FUDO_API_SALE_STATE_FILTER",
+              "value": false,
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8b3ce15c-af73-4d8e-8887-8510cfa2c1f7",
+      "name": "Config Piloto",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -520,
+        144
+      ],
+      "notes": "Parámetros del piloto. Completar PILOT_START_ISO y, en modo single, sale/item ids. No inventar fechas. Filtros API off hasta probe.",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {},
+      "id": "2b48cea2-7b0a-4266-882a-ec10c8f646ed",
+      "name": "Dry-run Evento Consumo",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        368
+      ],
+      "notes": "Sustituto temporal del RPC. Inspeccionar payload aquí antes de habilitar escrituras.",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "content": "## Piloto Barrio Chino\n- LOCATION_ID = d8d78b7d-eec5-4e90-8f2d-98268a875d00\n- PILOT_SINGLE_ITEM=true + sale/item ids\n- PILOT_START_ISO obligatorio si single=false\n- RPC / pendientes DESHABILITADOS\n- Filtros API off hasta `probe-fudo-sales-filters.mjs`\n- Idempotencia: source_id = item_id",
+        "height": 280,
+        "width": 380
+      },
+      "id": "abe03609-d44e-4050-967c-6fd56d973867",
+      "name": "NOTA — Piloto seguro",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        -40
+      ]
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Config Piloto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config Piloto": {
+      "main": [
+        [
+          {
+            "node": "Fudo - Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fudo - Token": {
+      "main": [
+        [
+          {
+            "node": "Fudo - Obtener Ventas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fudo - Obtener Ventas": {
+      "main": [
+        [
+          {
+            "node": "Separar Ventas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar Ventas": {
+      "main": [
+        [
+          {
+            "node": "Separar Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar Items": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Fin del lote (done)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fudo - Obtener Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fudo - Obtener Item": {
+      "main": [
+        [
+          {
+            "node": "Preparar Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Item": {
+      "main": [
+        [
+          {
+            "node": "Fudo - Obtener Producto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fudo - Obtener Producto": {
+      "main": [
+        [
+          {
+            "node": "Preparar Venta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Venta": {
+      "main": [
+        [
+          {
+            "node": "¿Item cancelado?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Item cancelado?": {
+      "main": [
+        [
+          {
+            "node": "Ítem omitido (cancelado)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Buscar Receta SENDA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ítem omitido (cancelado)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Receta SENDA": {
+      "main": [
+        [
+          {
+            "node": "Cruzar Ventas y Recetas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cruzar Ventas y Recetas": {
+      "main": [
+        [
+          {
+            "node": "¿Tiene receta?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Tiene receta?": {
+      "main": [
+        [
+          {
+            "node": "Obtener Componentes Receta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Identificar Sin Receta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Componentes Receta": {
+      "main": [
+        [
+          {
+            "node": "Calcular Consumo Multi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calcular Consumo Multi": {
+      "main": [
+        [
+          {
+            "node": "Buscar Inventario Local",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar Inventario Local": {
+      "main": [
+        [
+          {
+            "node": "Preparar Evento Consumo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Evento Consumo": {
+      "main": [
+        [
+          {
+            "node": "Dry-run Evento Consumo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dry-run Evento Consumo": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Evento Consumo SENDA - RPC": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identificar Sin Receta": {
+      "main": [
+        [
+          {
+            "node": "Agrupar Productos Sin Receta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrupar Productos Sin Receta": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e6c2784c-f725-42c5-b193-22bd0a20bd07",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "08ebfa5466fd29df913870cf763119b080e0d7d5b42436b323607a79cade0963",
+    "sanitized": true,
+    "pilotSafe": true
+  },
+  "nodeGroups": [],
+  "id": "5854d07d-c02e-40bc-bc0a-ce645864f2bf",
+  "tags": [],
+  "pinData": {}
+}

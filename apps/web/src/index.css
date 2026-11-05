@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Manrope, ui-sans-serif, system-ui, sans-serif;
+  color: #0a1a2e;
+  background: #f4f1ec;
+  font-synthesis: none;
+
+  /* Brand */
+  --senda-navy: #0a1a2e;
+  --senda-orange: #ff4c00;
+  --senda-ink: #0a1a2e;
+  --senda-muted: #5f6b7a;
+
+  /* Surfaces */
+  --senda-canvas: #f4f1ec;
+  --senda-surface: #ffffff;
+  --senda-subtle: #f7f5f2;
+  --senda-border: #e4e0d8;
+  --senda-border-strong: #d2cdc3;
+
+  /* Elevation */
+  --senda-shadow-sm: 0 1px 2px rgba(10, 26, 46, 0.04);
+  --senda-shadow-panel: 0 1px 2px rgba(10, 26, 46, 0.04), 0 10px 28px rgba(10, 26, 46, 0.06);
+  --senda-shadow-raised: 0 8px 24px rgba(10, 26, 46, 0.1);
+
+  /* Radius / space */
+  --radius-control: 0.625rem;
+  --radius-card: 1rem;
+  --radius-pill: 999px;
+  --space-page: clamp(1rem, 2vw, 2rem);
+  --content-max: 1440px;
+  --sidebar-width: 16.5rem;
+  --sidebar-collapsed: 4.75rem;
+  --sidebar-expanded: 16.5rem;
+  --sidebar-gap: 0.75rem;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--senda-canvas);
+  color: var(--senda-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea { font: inherit; }
+
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--senda-orange) 70%, white);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--senda-navy) 18%, transparent);
+}
+
+@layer components {
+  .gg-page {
+    @apply mx-auto w-full space-y-6;
+    max-width: var(--content-max);
+    padding: var(--space-page);
+  }
+
+  .gg-section-title {
+    @apply m-0 text-base font-bold tracking-tight text-senda-ink;
+  }
+
+  .gg-section-meta {
+    @apply mb-0 mt-1 text-xs leading-5 text-senda-muted;
+  }
+
+  .gg-table-wrap {
+    @apply overflow-x-auto;
+  }
+
+  .gg-table {
+    @apply w-full border-collapse text-left text-sm;
+  }
+
+  .gg-table thead tr {
+    @apply border-b border-senda-border bg-senda-subtle text-[11px] uppercase tracking-[0.06em] text-senda-muted;
+  }
+
+  .gg-table th {
+    @apply px-4 py-3 font-semibold sm:px-5;
+  }
+
+  .gg-table td {
+    @apply border-b border-senda-border px-4 py-3.5 align-middle sm:px-5;
+  }
+
+  .gg-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .gg-table tbody tr {
+    @apply transition-colors hover:bg-orange-50/40;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "@senda-ops/api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "invoice:analyze": "tsx src/scripts/analyzeInvoice.ts",
+    "mayoristanet:void:dry-run": "tsx src/scripts/runExceptionalMayoristanetVoid.ts --dry-run",
+    "mayoristanet:void:confirm": "tsx src/scripts/runExceptionalMayoristanetVoid.ts --confirm",
+    "mayoristanet:void:test": "node sql/run-test-exceptional-void-mayoristanet.mjs",
+    "sale-event:test": "node sql/run-test-senda-sale-consumption-event.mjs",
+    "n8n:fudo-sale-event:build": "node n8n/build-fudo-sale-event-workflow.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.76.1",
+    "cors": "^2.8.5",
+    "decimal.js": "^10.6.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
+    "multer": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.3.0",
+    "@types/node": "^22.18.6",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.4",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
