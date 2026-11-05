@@ -1,6 +1,6 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm run build -w @senda-ops/api"
+buildCommand = "npm ci --include=dev && npm run build -w @senda-ops/api"
 
 [deploy]
 startCommand = "npm run start -w @senda-ops/api"
