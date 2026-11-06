@@ -43,7 +43,7 @@ export const EMPTY_AUTHORIZED_SCOPE: AuthorizedScopeState = {
 export const SCOPE_PREFERENCE_PREFIX = 'senda-ops.scope.v1:'
 
 export type AuthorizedScopeAction =
-  | { type: 'RESET'; orgGeneration: number; locationGeneration: number }
+  | { type: 'RESET'; orgGeneration: number; locationGeneration: number; loading: boolean }
   | { type: 'ORGS_LOADING'; generation: number }
   | { type: 'ORGS_LOADED'; generation: number; organizations: Organization[]; preferredOrganizationId?: string }
   | { type: 'ORGS_FAILED'; generation: number; error: string }
@@ -185,6 +185,7 @@ export function authorizedScopeReducer(
     case 'RESET':
       return {
         ...EMPTY_AUTHORIZED_SCOPE,
+        loading: action.loading,
         orgGeneration: action.orgGeneration,
         locationGeneration: action.locationGeneration,
       }
@@ -300,6 +301,7 @@ export class AuthorizedScopeSession {
     this.locationGeneration += 1
     this.apply({
       type: 'RESET',
+      loading: Boolean(this.userId),
       orgGeneration: this.orgGeneration,
       locationGeneration: this.locationGeneration,
     })

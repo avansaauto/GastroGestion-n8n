@@ -10,6 +10,24 @@ import { isOrganizationChangeRequest, LOCATION_GATE_PATH, safeReturnPath } from 
 import { locationName, organizationName } from '@/lib/operations'
 import type { Location, Organization } from '@/lib/api'
 
+export function ScopeBootScreen() {
+  return (
+    <main
+      className="grid min-h-dvh place-items-center bg-senda-canvas px-4"
+      style={{
+        paddingTop: 'max(1.5rem, env(safe-area-inset-top))',
+        paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
+      }}
+    >
+      <div className="flex flex-col items-center gap-3 text-center">
+        <img alt="" className="h-12 w-12 object-contain" height={48} src="/Gastrogest_logo.png" width={48} />
+        <Loader2 className="animate-spin text-senda-navy" size={20} />
+        <p className="m-0 text-sm font-semibold text-senda-ink">Preparando tu local</p>
+      </div>
+    </main>
+  )
+}
+
 export function LocationGateView({
   loading,
   error,
@@ -39,9 +57,17 @@ export function LocationGateView({
   const showOrganizations = organizations.length > 1 && (choosingOrganization || !organization)
   const showLocations = Boolean(organization) && !showOrganizations && !loading
 
+  if (loading) return <ScopeBootScreen />
+
   return (
-    <main className="grid min-h-screen place-items-center bg-senda-canvas px-5 py-8">
-      <Card className="w-full max-w-lg p-7">
+    <main
+      className="grid min-h-dvh place-items-center bg-senda-canvas px-4 py-6"
+      style={{
+        paddingTop: 'max(1.5rem, env(safe-area-inset-top))',
+        paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
+      }}
+    >
+      <Card className="w-full max-w-lg p-5 sm:p-7">
         <div className="mb-7 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <img
@@ -61,37 +87,35 @@ export function LocationGateView({
           </Button>
         </div>
 
-        <h1 className="m-0 text-2xl font-bold">¿Con qué local querés trabajar?</h1>
-        <p className="mb-0 mt-2 text-sm text-senda-muted">
-          El local activo define facturas, recepciones y existencias. El catálogo de insumos sigue siendo de la organización.
-        </p>
-
-        {loading && (
-          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-senda-muted">
-            <Loader2 className="animate-spin" size={19} /> Cargando locales autorizados…
-          </div>
+        <h1 className="m-0 text-xl font-bold sm:text-2xl">
+          {error ? 'No pudimos confirmar tu local' : '¿Con qué local querés trabajar?'}
+        </h1>
+        {!error && (
+          <p className="mb-0 mt-2 text-sm text-senda-muted">
+            El local activo define facturas, recepciones y existencias. El catálogo de insumos sigue siendo de la organización.
+          </p>
         )}
 
-        {!loading && error && (
+        {error && (
           <div className="mt-6 space-y-4">
             <p className="mb-0 text-sm text-red-700" role="alert">{error}</p>
             <Button onClick={onRetry} type="button">Reintentar</Button>
           </div>
         )}
 
-        {!loading && !error && empty === 'no_organizations' && (
+        {!error && empty === 'no_organizations' && (
           <p className="mb-0 mt-6 text-sm text-senda-muted">
             No hay organizaciones disponibles para este usuario. Pedí acceso a un administrador de SENDA.
           </p>
         )}
 
-        {!loading && !error && empty === 'no_locations' && organization && (
+        {!error && empty === 'no_locations' && organization && (
           <p className="mb-0 mt-6 text-sm text-senda-muted">
             {organizationName(organization)} no tiene locales autorizados para tu usuario.
           </p>
         )}
 
-        {!loading && !error && showOrganizations && (
+        {!error && showOrganizations && (
           <div className="mt-6 space-y-3">
             <p className="mb-0 text-xs font-semibold uppercase tracking-wide text-senda-muted">Organización</p>
             <div className="grid gap-2">
@@ -112,7 +136,7 @@ export function LocationGateView({
           </div>
         )}
 
-        {!loading && !error && showLocations && organization && (
+        {!error && showLocations && organization && (
           <div className="mt-6 space-y-3">
             <div className="flex items-end justify-between gap-3">
               <div>
@@ -154,6 +178,8 @@ export function LocationGatePage() {
   const [params] = useSearchParams()
   const next = safeReturnPath(params.get('next'))
   const [pickingOrganization, setPickingOrganization] = useState(() => isOrganizationChangeRequest(params.toString()))
+
+  if (scope.loading && !pickingOrganization) return <ScopeBootScreen />
 
   if (hasActiveAuthorizedScope(scope) && !pickingOrganization) {
     return <Navigate replace to={next === LOCATION_GATE_PATH ? '/' : next} />

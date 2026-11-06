@@ -3,9 +3,9 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { AuthorizedScopeProvider, useAuthorizedScopeContext } from '@/lib/AuthorizedScopeProvider'
 import { WorkspaceGuardProvider } from '@/lib/WorkspaceGuardProvider'
 import { useAuth } from '@/lib/auth'
-import { locationGateRedirect, needsLocationGate } from '@/lib/locationGate'
+import { locationGateRedirect, scopeShell } from '@/lib/locationGate'
 import { LoginPage } from '@/pages/LoginPage'
-import { LocationGatePage } from '@/pages/LocationGatePage'
+import { LocationGatePage, ScopeBootScreen } from '@/pages/LocationGatePage'
 import { InventoryPage } from '@/pages/InventoryPage'
 import { InventoryHistoryPage } from '@/pages/InventoryHistoryPage'
 import { SalesConsumptionsPage } from '@/pages/SalesConsumptionsPage'
@@ -25,13 +25,19 @@ function ProtectedOperations() {
   const scope = useAuthorizedScopeContext()
   const location = useLocation()
 
-  if (needsLocationGate({
+  const shell = scopeShell({
     previewMode,
+    loading: scope.loading,
+    error: scope.error,
     organizations: scope.organizations,
     locations: scope.locations,
     organizationId: scope.organizationId,
     locationId: scope.locationId,
-  })) {
+  })
+
+  if (shell === 'boot') return <ScopeBootScreen />
+
+  if (shell === 'gate') {
     return <Navigate replace to={locationGateRedirect(location.pathname, location.search)} />
   }
 

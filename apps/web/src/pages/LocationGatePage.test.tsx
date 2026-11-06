@@ -33,8 +33,8 @@ function renderGate(overrides: Partial<Parameters<typeof LocationGateView>[0]> =
 describe('pantalla de selección de local', () => {
   it('muestra carga mientras resuelve el alcance', () => {
     const html = renderGate({ loading: true })
-    expect(html).toContain('¿Con qué local querés trabajar?')
-    expect(html).toContain('Cargando locales autorizados')
+    expect(html).toContain('Preparando tu local')
+    expect(html).not.toContain('¿Con qué local querés trabajar?')
     expect(html).not.toContain('Barrio Chino')
   })
 

@@ -30,11 +30,13 @@ export function AuthorizedScopeProvider({ children }: { children: ReactNode }) {
   const userId = previewMode ? null : user?.id ?? null
   const sessionRef = useRef<AuthorizedScopeSession>()
   if (!sessionRef.current) {
-    sessionRef.current = new AuthorizedScopeSession({
+    const created = new AuthorizedScopeSession({
       getOrganizations,
       getLocations,
       storage: browserScopeStorage(),
     })
+    created.setUser(userId)
+    sessionRef.current = created
   }
   const session = sessionRef.current
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot, session.getSnapshot)

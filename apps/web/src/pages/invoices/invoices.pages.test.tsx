@@ -254,9 +254,10 @@ describe('pantallas de facturas', () => {
         </AuthProvider>
       </MemoryRouter>,
     )
-    expect(html).toContain('Analizar factura')
+    expect(html).toContain('Subir factura')
     expect(html).toContain('Arrastrá un comprobante')
     expect(html).toContain('máximo 10 MB')
+    expect(html).not.toContain('Analizar factura')
     expect(html).not.toContain('El selector no autoriza por sí solo')
     expect(html).not.toContain('>Organización<')
     expect(html).not.toContain('label="Local"')

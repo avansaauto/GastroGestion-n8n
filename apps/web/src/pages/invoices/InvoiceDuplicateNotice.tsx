@@ -1,8 +1,6 @@
 import { Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import {
-  DELETED_PRIOR_BODY,
-  DELETED_PRIOR_TITLE,
   DUPLICATE_CHECKING_MESSAGE,
   DUPLICATE_LOOKUP_FAILED_MESSAGE,
   DUPLICATE_OPEN_LABEL,
@@ -29,13 +27,8 @@ export function InvoiceDuplicateNotice({ duplicate }: { duplicate: InvoiceDuplic
     )
   }
 
-  if (duplicate.status === 'noted') {
-    return (
-      <div className="mt-5 rounded-xl border border-senda-border bg-senda-subtle px-4 py-4">
-        <p className="m-0 text-sm font-semibold">{DELETED_PRIOR_TITLE}</p>
-        <p className="mb-0 mt-2 text-sm text-senda-muted">{DELETED_PRIOR_BODY}</p>
-      </div>
-    )
+  if (duplicate.status === 'noted' || duplicate.status === 'idle' || duplicate.status === 'clear') {
+    return null
   }
 
   if (duplicate.status !== 'matched' || !duplicate.match) return null

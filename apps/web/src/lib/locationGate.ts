@@ -41,7 +41,27 @@ export function needsLocationGate(input: {
   locations: Location[]
   organizationId: string
   locationId: string
+  loading?: boolean
+  error?: string
 }) {
   if (input.previewMode) return false
+  if (input.loading) return false
+  if (input.error) return true
   return !hasActiveAuthorizedScope(input)
+}
+
+/** Qué muestra el shell después de autenticar, sin adelantar la puerta de local. */
+export function scopeShell(input: {
+  previewMode: boolean
+  loading: boolean
+  error?: string
+  organizations: Organization[]
+  locations: Location[]
+  organizationId: string
+  locationId: string
+}): 'boot' | 'gate' | 'app' {
+  if (input.previewMode) return 'app'
+  if (input.loading) return 'boot'
+  if (needsLocationGate(input)) return 'gate'
+  return 'app'
 }
