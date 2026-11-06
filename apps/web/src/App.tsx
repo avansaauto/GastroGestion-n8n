@@ -16,6 +16,7 @@ import { OverviewPage } from '@/pages/OverviewPage'
 import { CreateRecipePage } from '@/pages/CreateRecipePage'
 import { EditRecipePage } from '@/pages/EditRecipePage'
 import { RecipeDetailPage } from '@/pages/RecipeDetailPage'
+import { IntegrationsPage } from '@/pages/IntegrationsPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { PendingCreateRedirect, PendingProductsRedirect, RecipesPage } from '@/pages/RecipesPage'
 
@@ -41,7 +42,7 @@ function ProtectedOperations() {
           <Route path="/" element={<OverviewPage />} />
           <Route path="/inventario" element={<InventoryPage />} />
           <Route path="/historial" element={<InventoryHistoryPage />} />
-          <Route path="/integraciones" element={<Navigate replace to="/historial" />} />
+          <Route path="/integraciones" element={<IntegrationsPage />} />
           <Route path="/ventas-consumos" element={<SalesConsumptionsPage />} />
           <Route path="/recetas" element={<RecipesPage />} />
           <Route path="/recetas/crear" element={<CreateRecipePage />} />

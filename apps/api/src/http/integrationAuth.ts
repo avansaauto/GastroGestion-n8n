@@ -7,6 +7,8 @@ import { createHmac, timingSafeEqual } from 'node:crypto'
  */
 export const INVOICE_INGEST_SCOPE = 'invoices.ingest' as const
 export const FUDO_CATALOG_SYNC_SCOPE = 'fudo.catalog.sync' as const
+/** Orquesta un trabajo ya creado. No recibe ni devuelve secretos de Fudo. */
+export const FUDO_SYNC_RUN_SCOPE = 'fudo.sync.run' as const
 
 const UUID_PATTERN =
   '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}'

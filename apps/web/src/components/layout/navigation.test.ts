@@ -18,6 +18,7 @@ describe('navegación GastroGest', () => {
       'Recetas',
       'Ventas y consumos',
       'Historial',
+      'Integraciones',
       'Configuración',
     ])
     expect(navigationItems.some((entry) => entry.type === 'link' && entry.path === '/facturas')).toBe(true)

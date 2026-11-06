@@ -94,10 +94,15 @@ export function SettingsPage() {
           </div>
           <SettingRow
             label="Fudo"
-            value="Ventas → consumos"
-            badge={{ tone: 'success', label: 'Conectado' }}
-            hint="Eventos de venta procesados vía n8n hacia el inventario."
+            value="Por sucursal"
+            badge={{ tone: 'info', label: 'Configurar' }}
+            hint="La conexión se administra en Integraciones. No queda marcada como activa para todos los locales."
           />
+          <div className="pt-3">
+            <Link className="text-sm font-semibold text-senda-navy hover:underline" to="/integraciones">
+              Abrir integraciones
+            </Link>
+          </div>
           <SettingRow
             label="Supabase"
             value="SENDA"

@@ -119,10 +119,29 @@ export async function syncFudoProductCatalog(input: {
   }
 
   const parsed = parseFudoCatalogSyncBody(input.body)
+  return writeFudoCatalogBatch({
+    admin: input.admin,
+    organizationId: principal.organizationId,
+    locationId: principal.locationId,
+    products: parsed.products,
+    markMissingInactive: parsed.markMissingInactive,
+    now: input.now,
+  })
+}
+
+/** Upsert idempotente. No desactiva ausentes salvo un lote marcado como completo. */
+export async function writeFudoCatalogBatch(input: {
+  admin: SupabaseClient
+  organizationId: string
+  locationId: string
+  products: FudoCatalogProductInput[]
+  markMissingInactive: boolean
+  now?: Date
+}): Promise<FudoCatalogSyncResult> {
   const syncedAt = (input.now ?? new Date()).toISOString()
-  const rows = parsed.products.map((product) => ({
-    organization_id: principal.organizationId,
-    location_id: principal.locationId,
+  const rows = input.products.map((product) => ({
+    organization_id: input.organizationId,
+    location_id: input.locationId,
     source: 'fudo',
     external_product_id: product.externalProductId,
     name: product.name,
@@ -144,12 +163,12 @@ export async function syncFudoProductCatalog(input: {
   }
 
   let deactivated = 0
-  if (parsed.markMissingInactive) {
-    const ids = parsed.products.map((product) => product.externalProductId)
+  if (input.markMissingInactive) {
+    const ids = input.products.map((product) => product.externalProductId)
     const { data: existing, error: listError } = await input.admin
       .from('fudo_product_catalog')
       .select('external_product_id')
-      .eq('location_id', principal.locationId)
+      .eq('location_id', input.locationId)
       .eq('source', 'fudo')
       .eq('active', true)
 
@@ -170,7 +189,7 @@ export async function syncFudoProductCatalog(input: {
       const { error: deactivateError } = await input.admin
         .from('fudo_product_catalog')
         .update({ active: false, updated_at: syncedAt, last_synced_at: syncedAt })
-        .eq('location_id', principal.locationId)
+        .eq('location_id', input.locationId)
         .eq('source', 'fudo')
         .in('external_product_id', missing)
 
@@ -186,10 +205,10 @@ export async function syncFudoProductCatalog(input: {
   }
 
   return {
-    organizationId: principal.organizationId,
-    locationId: principal.locationId,
-    received: parsed.products.length,
-    upserted: parsed.products.length,
+    organizationId: input.organizationId,
+    locationId: input.locationId,
+    received: input.products.length,
+    upserted: input.products.length,
     deactivated,
     lastSyncedAt: syncedAt,
   }

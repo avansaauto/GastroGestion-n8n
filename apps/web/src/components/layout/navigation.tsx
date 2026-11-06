@@ -1,5 +1,6 @@
 import {
   Boxes,
+  Cable,
   ChartNoAxesCombined,
   CircleGauge,
   FileText,
@@ -38,6 +39,7 @@ export const navigationItems: NavigationEntry[] = [
   { type: 'link', label: 'Recetas', path: '/recetas', icon: UtensilsCrossed },
   { type: 'link', label: 'Ventas y consumos', path: '/ventas-consumos', icon: ChartNoAxesCombined },
   { type: 'link', label: 'Historial', path: '/historial', icon: History },
+  { type: 'link', label: 'Integraciones', path: '/integraciones', icon: Cable },
   { type: 'link', label: 'Configuración', path: '/configuracion', icon: Settings },
 ]
 
@@ -51,7 +53,7 @@ export type NavigationSection = {
 export const navigationSections: NavigationSection[] = [
   { id: 'operacion', label: 'Operación', paths: ['/', '/inventario', '/ventas-consumos'] },
   { id: 'gestion', label: 'Gestión', paths: ['/facturas', '/recetas'] },
-  { id: 'sistema', label: 'Sistema', paths: ['/historial', '/configuracion'] },
+  { id: 'sistema', label: 'Sistema', paths: ['/historial', '/integraciones', '/configuracion'] },
 ]
 
 export function navigationLinksInSection(section: NavigationSection): NavigationLink[] {

@@ -6,6 +6,8 @@ import { corsAllowedOrigins } from './http/runtimeConfig.js'
 import { isSupabaseConfigured } from './lib/supabase.js'
 import type { InvoiceAiProvider } from './modules/invoice-intelligence/index.js'
 import { createFudoCatalogRouter } from './routes/fudoCatalog.js'
+import { createFudoIntegrationRouter } from './routes/fudoIntegration.js'
+import { createFudoSyncJobRouter } from './routes/fudoSyncJobs.js'
 import { createInvoicesRouter, type InvoiceRouterDependencies } from './routes/invoices.js'
 import { createOperationsRouter } from './routes/operations.js'
 import type { OperationsRepository } from './services/operationsRepository.js'
@@ -35,6 +37,8 @@ export function createApp(dependencies: AppDependencies = {}) {
   })
 
   app.use('/api', createFudoCatalogRouter())
+  app.use('/api', createFudoSyncJobRouter())
+  app.use('/api', createFudoIntegrationRouter())
   app.use('/api/invoices', createInvoicesRouter({
     ...dependencies.invoices,
     provider: dependencies.invoiceProvider ?? dependencies.invoices?.provider,
